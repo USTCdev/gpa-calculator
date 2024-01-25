@@ -1,0 +1,45 @@
+{
+  "editor.guides.bracketPairs": "active",
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "\\$cls`([\\s\\S]*?)`",
+      "(\\S+)"
+    ],
+    [
+      "\\$cls\\(([^\\)]*)\\)",
+      "\\\"(.*?)\\\""
+    ],
+    [
+      "\\$cls\\(([^\\)]*)\\)",
+      "`(.*?)`"
+    ],
+    [
+      "addCls\\(([^\\)]*)\\)",
+      "\\\"(.*?)\\\""
+    ],
+    [
+      "addCls\\(([^\\)]*)\\)",
+      "`(.*?)`"
+    ],
+    [
+      "\\$clsFunc`([\\s\\S]*?)`",
+      "(\\S+)"
+    ],
+    [
+      "\\$clsFunc\\(([^\\)]*)\\)",
+      "\\\"(.*?)\\\""
+    ],
+    [
+      "\\$clsStr`([\\s\\S]*?)`",
+      "(\\S+)"
+    ],
+    [
+      "\\$clsStr\\(([^\\)]*)\\)",
+      "\\\"(.*?)\\\""
+    ]
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

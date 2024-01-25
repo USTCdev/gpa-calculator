@@ -1,0 +1,12 @@
+@import url(./jw.css);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+label {
+  font-weight: normal;
+}
+
+.table-head > th {
+  color: #333 !important;
+}
