@@ -213,7 +213,7 @@ const tempLevel = model<Level>("A+");
 const tempPass = model(true);
 
 const EditorFragment = (_: Context) => {
-  _.$cls`flex gap-x-4 flex-wrap`;
+  _.$cls`flex gap-x-6 flex-wrap`;
   _.div(_ => {
     _.div(_ => {
       _(TextInput)("名称", "name");
@@ -224,7 +224,7 @@ const EditorFragment = (_: Context) => {
       _(NumberInput)("学分", "credits");
     });
     _.$ref(tabsRef);
-    _.$css`padding:0;max-height:130px;min-height:110px`;
+    _.$css`padding:0;max-height:130px;min-height:110px;margin-left:-4px`;
     if (
       _.fTabs(
         "百分制",
@@ -318,7 +318,7 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
 
     _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
     _.h2("Editor");
-    _.$cls`p-2 border-2 border-solid border-gray-500 rounded-md `;
+    _.$cls`pb-4 pl-4 border-2 border-solid border-gray-300 rounded-lg`;
     _.div(EditorFragment);
 
     _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
@@ -333,7 +333,7 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
           : "在上方编辑器中添加课程吧",
       );
     });
-    _.$cls`p-14 flex-1 border-2 border-solid border-gray-500 rounded-md`;
+    _.$cls`p-14 flex-1 border-2 border-solid border-gray-300 rounded-lg`;
     _.div(OutputFragment);
   });
 });
