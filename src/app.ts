@@ -96,6 +96,7 @@ const OutputFragment = (_: Context) => {
         _ =>
           _.$cls`semester` &&
           _.div(_ => {
+            _.$cls`text-[15px] py-[9px]`
             _.h4("2023年秋季学期");
             _.$cls`course-table table table-bordered table-striped table-hover table-condensed`;
             _.table(
