@@ -17,7 +17,7 @@ export function loadFromJw(raw: string) {
     let id = nameAndId.match(/[A-Z0-9]+$/)?.[0] ?? "";
     let name = nameAndId.slice(0, -id.length);
     if (
-      ["CS", "PHYS", "MATH", "IFL", "HS"].some(v => id.slice(1).startsWith(v))
+      ["CS", "PHYS", "MATH", "FL", "HS"].some(v => id.slice(1).startsWith(v))
     ) {
       name += id[0];
       id = id.slice(1);
