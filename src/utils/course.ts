@@ -32,7 +32,8 @@ export class Course {
 
   get level() {
     if (typeof this.score === "string") return this.score;
-    if (typeof this.score === "symbol") return this.score === passSym ? "P" : "F";
+    if (typeof this.score === "symbol")
+      return this.score === passSym ? "P" : "F";
     for (const [level, [min]] of Object.entries(levelMap)) {
       if (this.score >= min) return level as Level;
     }
@@ -41,6 +42,10 @@ export class Course {
 
   get gpa() {
     return levelMap[this.level][2];
+  }
+
+  get gpaStr() {
+    return typeof this.score === "symbol" ? "" : `${this.gpa}`;
   }
 
   get point() {

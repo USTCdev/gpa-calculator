@@ -155,7 +155,7 @@ const OutputFragment = (_: Context) => {
                 );
                 _.td(course.hour);
                 _.td(course.credits);
-                _.td(course.gpa);
+                _.td(course.gpaStr);
                 _.td(course.scoreStr);
               },
             );
@@ -360,7 +360,7 @@ const ImportExportFragment = (_: Context) => {
                 _.td(course.id);
                 _.td(course.hour);
                 _.td(course.credits);
-                _.td(course.gpa);
+                _.td(course.gpaStr);
                 _.td(course.scoreStr);
               },
             );
