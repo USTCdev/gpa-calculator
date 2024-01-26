@@ -43,7 +43,7 @@ jobs:
         run: git clone https://github.com/refinajs/refina.git
         working-directory: ../
       - name: Checkout refina
-        run: git checkout 72b3560b8c7963a50b281894ef08bdceb992f83c
+        run: git checkout d4d04446d0d0c4dbd3b1282f7111882e9866e3e1
         working-directory: ../refina
       - name: Install refina
         run: pnpm i
