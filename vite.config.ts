@@ -1,9 +1,14 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import Refina from "vite-plugin-refina";
 
 export default defineConfig({
-  plugins: [Refina()],
+  plugins: [Refina() as Plugin[]],
   optimizeDeps: {
     exclude: ["refina", "@refina/basic-components", "@refina/fluentui"],
+  },
+  server: {
+    fs: {
+      allow: [".."],
+    },
   },
 });

@@ -17,12 +17,13 @@
   },
   "devDependencies": {
     "@refina/tsconfig": "^0.2.0",
+    "@types/wicg-file-system-access": "^2023.10.4",
     "autoprefixer": "^10.4.15",
     "postcss": "^8.4.27",
     "prettier": "^3.0.0",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.3.3",
     "vite": "^4.4.0",
-    "vite-plugin-refina": "^0.3.1"
+    "vite-plugin-refina": "link:..\\refina\\packages\\vite-plugin"
   }
 }
