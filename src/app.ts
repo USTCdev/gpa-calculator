@@ -482,7 +482,7 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
           : "在上方编辑器中添加课程吧",
       );
     });
-    _.$cls`p-14 flex-1 ${containerStyle}`;
+    _.$cls`p-14 flex-1 min-w-fit ${containerStyle}`;
     _._div(
       {
         onclick: () => {
