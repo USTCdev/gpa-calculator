@@ -1,4 +1,4 @@
-import { Course, Level, Score, levelMap, notPassSym, passSym } from "./course";
+import { Course, Level, Score, levelMap, failSym, passSym } from "./course";
 
 export function loadFromJw(raw: string) {
   const lines = raw
@@ -29,7 +29,7 @@ export function loadFromJw(raw: string) {
     } else if (scoreRaw === "通过") {
       score = passSym;
     } else if (scoreRaw === "不通过") {
-      score = notPassSym;
+      score = failSym;
     } else if (levelMap[scoreRaw as Level] !== undefined) {
       score = scoreRaw as Level;
     } else {

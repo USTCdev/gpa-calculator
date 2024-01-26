@@ -17,9 +17,9 @@ export const levelMap = {
 export type Level = keyof typeof levelMap | "F";
 
 export const passSym = Symbol("通过");
-export const notPassSym = Symbol("不通过");
+export const failSym = Symbol("不通过");
 
-export type Score = number | Level | typeof passSym | typeof notPassSym;
+export type Score = number | Level | typeof passSym | typeof failSym;
 
 export class Course {
   constructor(

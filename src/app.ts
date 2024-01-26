@@ -25,7 +25,7 @@ import {
 } from "refina";
 import "./styles.css";
 import { version } from "./utils/constants";
-import { Course, Level, levelMap, notPassSym, passSym } from "./utils/course";
+import { Course, Level, levelMap, failSym, passSym } from "./utils/course";
 import { loadFromFile, saveToFile } from "./utils/file";
 import { loadFromJw } from "./utils/loadFromJw";
 
@@ -232,7 +232,7 @@ const EditorFragment = (_: Context) => {
         "二等级制",
         _ => {
           _.fCheckbox("通过", tempPass) &&
-            (tempCourse.score = tempPass.value ? passSym : notPassSym);
+            (tempCourse.score = tempPass.value ? passSym : failSym);
         },
       )
     ) {
@@ -243,7 +243,7 @@ const EditorFragment = (_: Context) => {
         tempCourse.score = tempLevel.value;
       }
       if (_.$ev === "二等级制") {
-        tempCourse.score = tempPass.value ? passSym : notPassSym;
+        tempCourse.score = tempPass.value ? passSym : failSym;
       }
     }
   });
