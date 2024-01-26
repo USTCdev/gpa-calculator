@@ -1,3 +1,13 @@
+import Basics from "@refina/basic-components";
+import FluentUI, { webDarkTheme, webLightTheme } from "@refina/fluentui";
+import { FiAdd16Filled } from "@refina/fluentui-icons/add";
+import { FiArrowImport20Filled } from "@refina/fluentui-icons/arrowImport";
+import { FiCheckmark16Filled } from "@refina/fluentui-icons/checkmark";
+import { FiDelete16Regular } from "@refina/fluentui-icons/delete";
+import { FiDismiss16Filled } from "@refina/fluentui-icons/dismiss";
+import { FiFolderOpen20Regular } from "@refina/fluentui-icons/folderOpen";
+import { FiInfo12Regular } from "@refina/fluentui-icons/info";
+import { FiSave20Regular } from "@refina/fluentui-icons/save";
 import {
   $app,
   $view,
@@ -10,76 +20,33 @@ import {
   model,
   propModel,
 } from "refina";
-import Basics from "@refina/basic-components";
-import FluentUI, { webDarkTheme, webLightTheme } from "@refina/fluentui";
-import { FiDismiss16Filled } from "@refina/fluentui-icons/dismiss";
-import { FiAdd16Filled } from "@refina/fluentui-icons/add";
-import { FiInfo12Regular } from "@refina/fluentui-icons/info";
 import "./styles.css";
+import { version } from "./utils/constants";
+import { Course, Level, levelMap, notPassSym, passSym } from "./utils/course";
+import { loadFromFile, saveToFile } from "./utils/file";
+import { loadFromJw } from "./utils/loadFromJw";
 
-const levelMap = {
-  "A+": [95, 98, 4.3],
-  A: [90, 93, 4],
-  "A-": [85, 88, 3.7],
-  "B+": [82, 84, 3.3],
-  B: [78, 80, 3],
-  "B-": [75, 77, 2.7],
-  "C+": [72, 74, 2.3],
-  C: [68, 70, 2],
-  "C-": [65, 67, 1.7],
-  "D+": [64, 65, 1.5],
-  D: [61, 63, 1.3],
-  "D-": [60, 61, 1],
-  F: [0, NaN, 0],
-  P: [0, NaN, 0],
-} as const;
-type Level = keyof typeof levelMap | "F";
+let courses: Course[] = [];
 
-const pass = Symbol("通过");
-const notPass = Symbol("不通过");
-
-type Score = number | Level | typeof pass | typeof notPass;
-
-class Course {
-  constructor(
-    public name: string = "",
-    public id: string = "",
-    public hour: number = 2,
-    public credits: number = 1,
-    public score: Score = 100,
-  ) {}
-
-  get level() {
-    if (typeof this.score === "string") return this.score;
-    if (typeof this.score === "symbol") return this.score === pass ? "P" : "F";
-    for (const [level, [min]] of Object.entries(levelMap)) {
-      if (this.score >= min) return level as Level;
-    }
-    return "F";
-  }
-
-  get gpa() {
-    return levelMap[this.level][2];
-  }
-
-  get point() {
-    if (typeof this.score === "number") return this.score;
-    else return levelMap[this.level][1];
-  }
-
-  get pass() {
-    return this.level !== "F";
-  }
-
-  get scoreStr() {
-    if (typeof this.score === "number") return this.score.toString();
-    else if (typeof this.score === "symbol")
-      return this.score === pass ? "通过" : "不通过";
-    else return this.score;
+const stored = localStorage.getItem("ustc.gpa.courses");
+if (stored) {
+  const parsed = JSON.parse(stored);
+  if (parsed.version === version) {
+    courses = parsed.courses.map(
+      (c: any) => new Course(c.name, c.id, c.hour, c.credits, c.score),
+    );
   }
 }
 
-let courses: Course[] = [];
+setInterval(() => {
+  localStorage.setItem(
+    "ustc.gpa.courses",
+    JSON.stringify({
+      version,
+      courses,
+    }),
+  );
+}, 500);
 
 function getOverview() {
   const calculatedCourses = courses.filter(c => typeof c.score !== "symbol");
@@ -139,14 +106,27 @@ const OutputFragment = (_: Context) => {
                   _._th({}, "绩点");
                   _._th({}, "成绩");
                 }),
-              "id",
-              course => {
+              byIndex,
+              (course, index) => {
+                const active = index === selected;
+
                 _.$cls`course-name hover:underline hover:text-blue-600`;
+                active && _.$cls`active-td font-bold`;
                 _._td(
                   {
-                    onclick: () => {
-                      selected = course;
+                    onclick: ev => {
+                      ev.stopPropagation();
+                      app.update();
 
+                      if (active) {
+                        selected = -1;
+                        resetTempCourse();
+                        return;
+                      }
+
+                      selected = index;
+                      selectedRestore = course.clone();
+                      tempCourse = course;
                       if (typeof course.score === "number") {
                         tabsRef.current!.activeTab = "百分制";
                         tempPoint.value = course.score;
@@ -163,8 +143,6 @@ const OutputFragment = (_: Context) => {
                         tempLevel.value = course.pass ? "A+" : "F";
                         tempPass.value = course.pass;
                       }
-
-                      app.update();
                     },
                   },
                   _ => {
@@ -186,104 +164,241 @@ const OutputFragment = (_: Context) => {
   }
 };
 
-let selected = new Course();
+const tabsRef = componentRef<"fTabs">();
 
-const TextInput = $view((name: string, key: keyof Course) => {
-  _.$cls`my-4`;
-  _.div(_ => {
-    _.$cls`block mb-0 mr-2 font-semibold text-xl`;
-    _.label(name);
-    _.fInput(propModel(selected, key) as Model<string>);
-  });
-});
+let selected: number = -1;
+let selectedRestore: Course | null = null;
+
+let tempCourse = new Course();
+const tempPoint = model(100);
+const tempLevel = model<Level>("A+");
+const tempPass = model(true);
+
+function resetTempCourse() {
+  tempCourse = new Course();
+  tempPoint.value = 100;
+  tempLevel.value = "A+";
+  tempPass.value = true;
+}
+
+const TextInput = $view(
+  (name: string, key: keyof Course, placeholder: string) => {
+    _.$cls`my-4`;
+    _.div(_ => {
+      _.$cls`block mb-0 mr-2 font-semibold text-xl`;
+      _.label(name);
+      _.fInput(propModel(tempCourse, key) as Model<string>, false, placeholder);
+    });
+  },
+);
 
 const NumberInput = $view((name: string, key: keyof Course) => {
   _.$cls`my-4`;
   _.div(_ => {
     _.$cls`block mb-0 mr-2 font-semibold text-xl`;
     _.label(name);
-    _.fNumberInput(propModel(selected, key) as Model<number>);
+    _.fNumberInput(propModel(tempCourse, key) as Model<number>);
   });
 });
-
-const tabsRef = componentRef<"fTabs">();
-
-const tempPoint = model(100);
-const tempLevel = model<Level>("A+");
-const tempPass = model(true);
 
 const EditorFragment = (_: Context) => {
   _.$cls`flex gap-x-6 flex-wrap`;
   _.div(_ => {
     _.div(_ => {
-      _(TextInput)("名称", "name");
-      _(TextInput)("编号", "id");
+      _(TextInput)("名称", "name", "e.g. 数学分析(B1)");
+      _(TextInput)("编号", "id", "e.g. MATH1006");
     });
     _.div(_ => {
       _(NumberInput)("学时", "hour");
       _(NumberInput)("学分", "credits");
     });
     _.$ref(tabsRef);
-    _.$css`padding:0;max-height:130px;min-height:110px;margin-left:-4px`;
+    _.$css`padding:0;max-height:130px;min-height:110px;margin-left:-4px;width:270px`;
     if (
       _.fTabs(
         "百分制",
         _ => {
-          _.fNumberInput(tempPoint);
+          _.fNumberInput(tempPoint) && (tempCourse.score = _.$ev);
         },
         "五等级制",
         _ => {
-          _.fDropdown(tempLevel, Object.keys(levelMap).slice(0, -1));
+          _.fDropdown(tempLevel, Object.keys(levelMap).slice(0, -1)) &&
+            (tempCourse.score = _.$ev as Level);
         },
         "二等级制",
         _ => {
-          _.fCheckbox("通过", tempPass);
+          _.fCheckbox("通过", tempPass) &&
+            (tempCourse.score = tempPass.value ? passSym : notPassSym);
         },
       )
     ) {
       if (_.$ev === "百分制") {
-        selected.score = tempPoint.value;
+        tempCourse.score = tempPoint.value;
       }
       if (_.$ev === "五等级制") {
-        selected.score = tempLevel.value;
+        tempCourse.score = tempLevel.value;
       }
       if (_.$ev === "二等级制") {
-        selected.score = tempPass.value ? pass : notPass;
+        tempCourse.score = tempPass.value ? passSym : notPassSym;
       }
     }
   });
 
-  const exist = courses.findIndex(c => c === selected) !== -1;
-  if (
-    exist &&
-    _.fButton(_ => {
-      _.$cls`mr-4`;
-      _(FiDismiss16Filled)();
-      _.span("删除");
-    })
-  ) {
-    courses = courses.filter(c => c.id !== selected.id);
-    selected = new Course();
-  }
+  const allFilled =
+    tempCourse.name.length &&
+    tempCourse.id.length &&
+    tempCourse.hour &&
+    tempCourse.credits;
 
-  const valid =
-    selected.name &&
-    selected.id &&
-    selected.hour &&
-    selected.credits &&
-    courses.findIndex(c => c.id === selected.id) === -1;
+  _.div(_ => {
+    if (selected !== -1) {
+      if (
+        _.fButton(_ => {
+          _.$cls`mr-4`;
+          _(FiCheckmark16Filled)();
+          _.span("保存更改");
+        }, !allFilled)
+      ) {
+        resetTempCourse();
+        selected = -1;
+      }
 
-  if (
-    !exist &&
-    _.fPrimaryButton(_ => {
-      _.$cls`mr-4`;
-      _(FiAdd16Filled)();
-      _.span("添加");
-    }, !valid)
-  ) {
-    courses.push(selected);
-    selected = new Course();
-  }
+      _.$cls`ml-4`;
+      _.span();
+
+      if (
+        _.fButton(_ => {
+          _.$cls`mr-4`;
+          _(FiDismiss16Filled)();
+          _.span("放弃更改");
+        })
+      ) {
+        courses[selected] = selectedRestore!;
+        resetTempCourse();
+        selected = -1;
+      }
+
+      _.$cls`ml-4`;
+      _.span();
+
+      if (
+        _.fButton(_ => {
+          _.$cls`mr-4`;
+          _(FiDelete16Regular)();
+          _.span("删除");
+        })
+      ) {
+        courses.splice(selected, 1);
+        selectedRestore = null;
+        resetTempCourse();
+        selected = -1;
+      }
+    } else {
+      if (
+        _.fPrimaryButton(_ => {
+          _.$cls`mr-4`;
+          _(FiAdd16Filled)();
+          _.span("添加");
+        }, !allFilled)
+      ) {
+        courses.push(tempCourse);
+        resetTempCourse();
+      }
+    }
+  });
+};
+
+const jwRawInput = model("");
+
+const ImportExportFragment = (_: Context) => {
+  _.$cls`grid gap-4`;
+  _.div(_ => {
+    _.$css`max-width: 100vw-24px`;
+    _.fDialog(
+      open =>
+        _.fButton(_ => {
+          _.$cls`mr-4`;
+          _(FiArrowImport20Filled)();
+          _.t`从教务系统导入`;
+        }) && open(),
+      "从教务系统导入",
+      _close => {
+        _.$cls`flex flex-col gap-4`;
+        _.div(_ => {
+          _.$cls`w-full h-[250px]`;
+          _.fTextarea(jwRawInput);
+
+          _.div(_ => {
+            _.$cls`ml-2 font-bold text-xl`;
+            _.div(_ => {
+              _.span("预览");
+              _.$cls`inline text-xl ml-6 mr-1`;
+              _(FiInfo12Regular)();
+              _.$cls`font-normal text-lg font-sans`;
+              _.span("如有错误，可以添加后再编辑哦");
+            });
+            _.$cls`table`;
+            _.table(
+              loadFromJw(jwRawInput.value),
+              ["名称", "编号", "学时", "学分", "绩点", "成绩"],
+              byIndex,
+              course => {
+                _.td(course.name);
+                _.td(course.id);
+                _.td(course.hour);
+                _.td(course.credits);
+                _.td(course.gpa);
+                _.td(course.scoreStr);
+              },
+            );
+          });
+        });
+      },
+      close => {
+        _.fButton("取消") && close();
+        _.fDialog(
+          open => _.fPrimaryButton("确定") && open(),
+          "确定？",
+          "导入后将会覆盖当前编辑器中的内容，确定要继续吗？",
+          closeInner => {
+            _.fButton("取消") && closeInner();
+            if (_.fPrimaryButton("确定")) {
+              courses = loadFromJw(jwRawInput.value);
+              selected = -1;
+              resetTempCourse();
+              close();
+              closeInner();
+            }
+          },
+        );
+      },
+      "end",
+      true,
+    );
+    if (
+      _.fButton(_ => {
+        _.$cls`mr-4`;
+        _(FiFolderOpen20Regular)();
+        _.t`从本地导入`;
+      })
+    ) {
+      loadFromFile().then(c => {
+        courses = c;
+        selected = -1;
+        resetTempCourse();
+        app.update();
+      });
+    }
+    if (
+      _.fButton(_ => {
+        _.$cls`mr-4`;
+        _(FiSave20Regular)();
+        _.t`保存至本地`;
+      })
+    ) {
+      saveToFile(courses);
+    }
+  });
 };
 
 const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
@@ -291,22 +406,24 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
   _.div(_ => {
     _.$cls`flex items-start`;
     _.div(_ => {
-      _.$cls`inline flex-grow font-extrabold text-6xl font-mono mt-6`;
+      _.$cls`inline flex-grow font-extrabold text-6xl font-mono mt-6 mb-1`;
       _.h1("USTC GPA Simulator");
 
       _.$cls`inline text-right font-mono h-0 overflow-visible mt-4`;
       _.div(_ => {
         _.p(_ => {
-          _.t`By: `;
+          _.t`By `;
           _.$attrs({ target: "_blank" });
           _.a("_Kerman", "https://github.com/kermanx");
         });
         _.p(_ => {
           _.$attrs({ target: "_blank" });
           _.a("Repository", "https://github.com/USTCdev/gpa-calculator");
-          _.$cls`ml-4`;
+          _.$cls`ml-3`;
+          _.span("|");
+          _.$cls`ml-3`;
           _.$attrs({ target: "_blank" });
-          _.a("Report", "https://github.com/USTCdev/gpa-calculator/issues/new");
+          _.a("Bug!", "https://github.com/USTCdev/gpa-calculator/issues/new");
         });
         _.p(_ => {
           _.t`Powered by `;
@@ -316,10 +433,26 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
       });
     });
 
-    _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
-    _.h2("Editor");
-    _.$cls`pb-4 pl-4 border-2 border-solid border-gray-300 rounded-lg`;
-    _.div(EditorFragment);
+    const containerStyle =
+      "border-2 border-solid border-gray-300 rounded-lg shadow-md";
+
+    _.$cls`relative flex gap-4 flex-wrap`;
+    _.div(_ => {
+      _.$cls`flex-grow`;
+      _.div(_ => {
+        _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
+        _.h2("Editor");
+        _.$cls`pb-4 px-4 ${containerStyle} min-h-[175px]`;
+        _.div(EditorFragment);
+      });
+      _.$cls`flex-grow flex flex-col`;
+      _.div(_ => {
+        _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
+        _.h2("Import & Export");
+        _.$cls`flex-grow p-4 ${containerStyle}`;
+        _.div(ImportExportFragment);
+      });
+    });
 
     _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
     _.h2(_ => {
@@ -333,8 +466,18 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
           : "在上方编辑器中添加课程吧",
       );
     });
-    _.$cls`p-14 flex-1 border-2 border-solid border-gray-300 rounded-lg`;
-    _.div(OutputFragment);
+    _.$cls`p-14 flex-1 ${containerStyle}`;
+    _._div(
+      {
+        onclick: () => {
+          console.log(app);
+          app.update();
+          selected = -1;
+          resetTempCourse();
+        },
+      },
+      OutputFragment,
+    );
   });
 });
 
