@@ -96,70 +96,79 @@ const OutputFragment = (_: Context) => {
         _ =>
           _.$cls`semester` &&
           _.div(_ => {
-            _.$cls`text-[15px] py-[9px]`
+            _.$cls`text-[15px] py-[9px]`;
             _.h4("2023年秋季学期");
             _.$cls`course-table table table-bordered table-striped table-hover table-condensed`;
-            _.table(
-              courses,
-              _ =>
-                _.$cls`table-head` &&
-                _._tr({}, _ => {
-                  _._th({}, "课程");
-                  _._th({}, "学时");
-                  _._th({}, "学分");
-                  _._th({}, "绩点");
-                  _._th({}, "成绩");
-                }),
-              byIndex,
-              (course, index) => {
-                const active = index === selected;
+            _._table({}, _ => {
+              _._thead(
+                {},
+                _ =>
+                  _.$cls`table-head` &&
+                  _._tr({}, _ => {
+                    _._th({}, "课程");
+                    _._th({}, "学时");
+                    _._th({}, "学分");
+                    _._th({}, "绩点");
+                    _._th({}, "成绩");
+                  }),
+              );
+              _._tbody({}, _ =>
+                _.for(
+                  courses,
+                  byIndex,
+                  (course, index) =>
+                    _.$cls(course.pass ? "" : "danger") &&
+                    _._tr({}, _ => {
+                      const active = index === selected;
 
-                _.$cls`course-name hover:underline hover:text-blue-600`;
-                active && _.$cls`active-td font-bold`;
-                _._td(
-                  {
-                    onclick: ev => {
-                      ev.stopPropagation();
-                      app.update();
+                      _.$cls`course-name hover:underline hover:text-blue-600`;
+                      active && _.$cls`active-td font-bold`;
+                      _._td(
+                        {
+                          onclick: ev => {
+                            ev.stopPropagation();
+                            app.update();
 
-                      if (active) {
-                        selected = -1;
-                        resetTempCourse();
-                        return;
-                      }
+                            if (active) {
+                              selected = -1;
+                              resetTempCourse();
+                              return;
+                            }
 
-                      selected = index;
-                      selectedRestore = course.clone();
-                      tempCourse = course;
-                      if (typeof course.score === "number") {
-                        tabsRef.current!.activeTab = "百分制";
-                        tempPoint.value = course.score;
-                        tempLevel.value = course.level;
-                        tempPass.value = course.pass;
-                      } else if (typeof course.score === "string") {
-                        tabsRef.current!.activeTab = "五等级制";
-                        tempPoint.value = course.point;
-                        tempLevel.value = course.score;
-                        tempPass.value = course.pass;
-                      } else {
-                        tabsRef.current!.activeTab = "二等级制";
-                        tempPoint.value = course.pass ? 100 : 0;
-                        tempLevel.value = course.pass ? "A+" : "F";
-                        tempPass.value = course.pass;
-                      }
-                    },
-                  },
-                  _ => {
-                    _.t(course.name);
-                    _._small({}, course.id);
-                  },
-                );
-                _.td(course.hour);
-                _.td(course.credits);
-                _.td(course.gpaStr);
-                _.td(course.scoreStr);
-              },
-            );
+                            selected = index;
+                            selectedRestore = course.clone();
+                            tempCourse = course;
+                            if (typeof course.score === "number") {
+                              tabsRef.current!.activeTab = "百分制";
+                              tempPoint.value = course.score;
+                              tempLevel.value = course.level;
+                              tempPass.value = course.pass;
+                            } else if (typeof course.score === "string") {
+                              tabsRef.current!.activeTab = "五等级制";
+                              tempPoint.value = course.point;
+                              tempLevel.value = course.score;
+                              tempPass.value = course.pass;
+                            } else {
+                              tabsRef.current!.activeTab = "二等级制";
+                              tempPoint.value = course.pass ? 100 : 0;
+                              tempLevel.value = course.pass ? "A+" : "F";
+                              tempPass.value = course.pass;
+                            }
+                          },
+                        },
+                        _ => {
+                          _.t(course.name);
+                          _._small({}, course.id);
+                        },
+                      );
+                      _.td(course.hour);
+                      _.td(course.credits);
+                      _.td(course.gpaStr);
+                      _.td(course.scoreStr);
+                    }),
+                ),
+              );
+            });
           }),
       ),
   );
