@@ -1,5 +1,5 @@
-import { version } from "./constants";
 import { Course } from "./course";
+import { dump, load } from "./json";
 
 export async function saveToFile(courses: Course[]) {
   try {
@@ -15,7 +15,7 @@ export async function saveToFile(courses: Course[]) {
       ],
     });
     const writable = await handle.createWritable();
-    await writable.write(JSON.stringify({ version, courses }, null, 2));
+    await writable.write(dump(courses));
     await writable.close();
   } catch (e: any) {
     if (e.name !== "AbortError") alert(e);
@@ -35,15 +35,7 @@ export async function loadFromFile() {
       ],
     });
     const file = await handle.getFile();
-    const json = JSON.parse(await file.text());
-    if (json.version === 1) {
-      return json.courses.map(
-        ({ name, id, hour, credits, score }: Partial<Course>) =>
-          new Course(name, id, hour, credits, score),
-      );
-    } else {
-      throw new Error("导入失败，版本不匹配");
-    }
+    return load(await file.text());
   } catch (e: any) {
     if (e.name !== "AbortError") alert(e);
     throw e;

@@ -24,31 +24,20 @@ import {
   propModel,
 } from "refina";
 import "./styles.css";
-import { version } from "./utils/constants";
-import { Course, Level, levelMap, failSym, passSym } from "./utils/course";
+import { Course, Level, failSym, levelMap, passSym } from "./utils/course";
 import { loadFromFile, saveToFile } from "./utils/file";
+import { dump, load } from "./utils/json";
 import { loadFromJw } from "./utils/loadFromJw";
 
 let courses: Course[] = [];
 
 const stored = localStorage.getItem("ustc.gpa.courses");
 if (stored) {
-  const parsed = JSON.parse(stored);
-  if (parsed.version === version) {
-    courses = parsed.courses.map(
-      (c: any) => new Course(c.name, c.id, c.hour, c.credits, c.score),
-    );
-  }
+  courses = load(stored, true);
 }
 
 setInterval(() => {
-  localStorage.setItem(
-    "ustc.gpa.courses",
-    JSON.stringify({
-      version,
-      courses,
-    }),
-  );
+  localStorage.setItem("ustc.gpa.courses", dump(courses));
 }, 500);
 
 function getOverview() {
@@ -507,7 +496,6 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
     _._div(
       {
         onclick: () => {
-          console.log(app);
           app.update();
           selected = -1;
           resetTempCourse();
