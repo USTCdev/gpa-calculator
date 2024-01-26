@@ -3,7 +3,10 @@ import FluentUI, { webDarkTheme, webLightTheme } from "@refina/fluentui";
 import { FiAdd16Filled } from "@refina/fluentui-icons/add";
 import { FiArrowImport20Filled } from "@refina/fluentui-icons/arrowImport";
 import { FiCheckmark16Filled } from "@refina/fluentui-icons/checkmark";
-import { FiDelete16Regular } from "@refina/fluentui-icons/delete";
+import {
+  FiDelete16Regular,
+  FiDelete20Regular,
+} from "@refina/fluentui-icons/delete";
 import { FiDismiss16Filled } from "@refina/fluentui-icons/dismiss";
 import { FiFolderOpen20Regular } from "@refina/fluentui-icons/folderOpen";
 import { FiInfo12Regular } from "@refina/fluentui-icons/info";
@@ -398,6 +401,16 @@ const ImportExportFragment = (_: Context) => {
     ) {
       saveToFile(courses);
     }
+    if (
+      _.fButton(_ => {
+        _.$cls`mr-4`;
+        _(FiDelete20Regular)();
+        _.t`清空`;
+      })
+    ) {
+      courses = [];
+      selected = -1;
+    }
   });
 };
 
@@ -442,7 +455,7 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
       _.div(_ => {
         _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
         _.h2("Editor");
-        _.$cls`pb-4 px-4 ${containerStyle} min-h-[175px]`;
+        _.$cls`pb-4 px-4 ${containerStyle} min-h-[180px]`;
         _.div(EditorFragment);
       });
       _.$cls`flex-grow flex flex-col`;
