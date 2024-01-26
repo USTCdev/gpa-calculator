@@ -339,10 +339,10 @@ const ImportExportFragment = (_: Context) => {
         _.$cls`inline ml-4 mr-1`;
         _(FiInfoRegular)();
         _.$cls`text-2xl font-normal hover:text-blue-500 hover:underline`;
-        _.$attrs({ target: "_blank" });
         _.a(
           "操作视频",
           "https://xhfs4.ztytech.com/CA107011/b478b4b8c5874d568b8eb93644d7fc5b.gif",
+          "_blank",
         );
       },
       _close => {
@@ -446,22 +446,26 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
       _.div(_ => {
         _.p(_ => {
           _.t`By `;
-          _.$attrs({ target: "_blank" });
-          _.a("_Kerman", "https://github.com/kermanx");
+          _.a("_Kerman", "https://github.com/kermanx", "_blank");
         });
         _.p(_ => {
-          _.$attrs({ target: "_blank" });
-          _.a("Repository", "https://github.com/USTCdev/gpa-calculator");
+          _.a(
+            "Repository",
+            "https://github.com/USTCdev/gpa-calculator",
+            "_blank",
+          );
           _.$cls`ml-3`;
           _.span("|");
           _.$cls`ml-3`;
-          _.$attrs({ target: "_blank" });
-          _.a("Bug!", "https://github.com/USTCdev/gpa-calculator/issues/new");
+          _.a(
+            "Bug!",
+            "https://github.com/USTCdev/gpa-calculator/issues/new",
+            "_blank",
+          );
         });
         _.p(_ => {
           _.t`Powered by `;
-          _.$attrs({ target: "_blank" });
-          _.a("Refina.js", "https://github.com/refinajs/refina");
+          _.a("Refina.js", "https://github.com/refinajs/refina", "_blank");
         });
       });
     });
