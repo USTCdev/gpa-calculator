@@ -11,6 +11,7 @@ import { FiDismiss16Filled } from "@refina/fluentui-icons/dismiss";
 import { FiFolderOpen20Regular } from "@refina/fluentui-icons/folderOpen";
 import { FiInfo12Regular, FiInfoRegular } from "@refina/fluentui-icons/info";
 import { FiSave20Regular } from "@refina/fluentui-icons/save";
+import "core-js/stable";
 import {
   $app,
   $view,
