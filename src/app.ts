@@ -430,7 +430,7 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
     _.$cls`flex items-start`;
     _.div(_ => {
       _.$cls`inline flex-grow font-extrabold text-6xl font-mono mt-6 mb-1`;
-      _.h1("USTC GPA Simulator");
+      _.h1("USTC GPA Calculator");
 
       _.$cls`inline text-right font-mono h-0 overflow-visible mt-4`;
       _.div(_ => {
