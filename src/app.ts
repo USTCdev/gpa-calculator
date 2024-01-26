@@ -219,30 +219,20 @@ const EditorFragment = (_: Context) => {
     if (
       _.fTabs(
         "百分制",
-        _ => {
-          _.fNumberInput(tempPoint) && (tempCourse.score = _.$ev);
-        },
+        _ => _.fNumberInput(tempPoint) && (tempCourse.score = _.$ev),
         "五等级制",
-        _ => {
+        _ =>
           _.fDropdown(tempLevel, Object.keys(levelMap).slice(0, -1)) &&
-            (tempCourse.score = _.$ev as Level);
-        },
+          (tempCourse.score = _.$ev as Level),
         "二等级制",
-        _ => {
+        _ =>
           _.fCheckbox("通过", tempPass) &&
-            (tempCourse.score = tempPass.value ? passSym : failSym);
-        },
+          (tempCourse.score = tempPass.value ? passSym : failSym),
       )
     ) {
-      if (_.$ev === "百分制") {
-        tempCourse.score = tempPoint.value;
-      }
-      if (_.$ev === "五等级制") {
-        tempCourse.score = tempLevel.value;
-      }
-      if (_.$ev === "二等级制") {
-        tempCourse.score = tempPass.value ? passSym : failSym;
-      }
+      if (_.$ev === "百分制") tempCourse.score = tempPoint.value;
+      else if (_.$ev === "五等级制") tempCourse.score = tempLevel.value;
+      else tempCourse.score = tempPass.value ? passSym : failSym;
     }
   });
 
