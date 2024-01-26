@@ -9,7 +9,7 @@ import {
 } from "@refina/fluentui-icons/delete";
 import { FiDismiss16Filled } from "@refina/fluentui-icons/dismiss";
 import { FiFolderOpen20Regular } from "@refina/fluentui-icons/folderOpen";
-import { FiInfo12Regular } from "@refina/fluentui-icons/info";
+import { FiInfo12Regular, FiInfoRegular } from "@refina/fluentui-icons/info";
 import { FiSave20Regular } from "@refina/fluentui-icons/save";
 import {
   $app,
@@ -324,7 +324,17 @@ const ImportExportFragment = (_: Context) => {
           _(FiArrowImport20Filled)();
           _.t`从教务系统导入`;
         }) && open(),
-      "从教务系统导入",
+      _ => {
+        _.t`从教务系统导入`;
+        _.$cls`inline ml-4 mr-1`;
+        _(FiInfoRegular)();
+        _.$cls`text-2xl font-normal hover:text-blue-500 hover:underline`;
+        _.$attrs({ target: "_blank" });
+        _.a(
+          "操作视频",
+          "https://xhfs4.ztytech.com/CA107011/b478b4b8c5874d568b8eb93644d7fc5b.gif",
+        );
+      },
       _close => {
         _.$cls`flex flex-col gap-4`;
         _.div(_ => {
