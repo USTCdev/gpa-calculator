@@ -22,7 +22,7 @@ import {
   componentRef,
   elementRef,
   model,
-  propModel
+  propModel,
 } from "refina";
 import "./styles.css";
 import { Course, Level, failSym, levelMap, passSym } from "./utils/course";
@@ -455,34 +455,16 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
     const containerStyle =
       "border-2 border-solid border-gray-300 rounded-lg shadow-md";
 
-    _.$cls`relative flex gap-4 flex-wrap`;
-    _.div(_ => {
-      _.$cls`flex-grow`;
-      _.div(_ => {
-        _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
-        _.h2("Editor");
-        _.$cls`pb-4 px-4 ${containerStyle} min-h-[180px]`;
-        _.div(EditorFragment);
-      });
-      _.$cls`flex-grow flex flex-col`;
-      _.div(_ => {
-        _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
-        _.h2("Import & Export");
-        _.$cls`flex-grow p-4 ${containerStyle}`;
-        _.div(ImportExportFragment);
-      });
-    });
-
     _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
     _.h2(_ => {
       _.t`Preview`;
-      _.$cls`inline text-xl ml-6 mr-1`;
+      _.$cls`inline text-xl ml-6 mr-1 text-blue-800`;
       _(FiInfo12Regular)();
-      _.$cls`font-normal text-xl font-sans`;
+      _.$cls`font-normal text-xl font-sans text-blue-800`;
       _.span(
         courses.length
           ? "点击表格中的课程名称可以编辑数据哦"
-          : "在上方编辑器中添加课程吧",
+          : "在下方编辑器中添加课程，或者从教务系统导入吧",
       );
     });
     _.$cls`p-14 flex-1 min-w-fit ${containerStyle}`;
@@ -496,6 +478,24 @@ const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
       },
       OutputFragment,
     );
+
+    _.$cls`relative flex gap-4 flex-wrap`;
+    _.div(_ => {
+      _.$cls`flex-grow`;
+      _.div(_ => {
+        _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
+        _.h2("Editor");
+        _.$cls`pb-4 px-4 ${containerStyle} min-h-[180px]`;
+        _.div(EditorFragment);
+      });
+      _.$cls`flex-grow flex flex-col`;
+      _.div(_ => {
+        _.$cls`text-4xl font-bold font-mono ml-1 mt-2`;
+        _.h2("File");
+        _.$cls`flex-grow p-4 ${containerStyle}`;
+        _.div(ImportExportFragment);
+      });
+    });
   });
 });
 
