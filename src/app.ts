@@ -25,7 +25,8 @@ import {
   propModel,
 } from "refina";
 import "./styles.css";
-import { Course, Level, failSym, levelMap, passSym } from "./utils/course";
+import { levelMap } from "./utils/constants";
+import { Course, Level, failSym, passSym } from "./utils/course";
 import { loadFromFile, saveToFile } from "./utils/file";
 import { dump, load } from "./utils/json";
 import { loadFromJw } from "./utils/loadFromJw";
@@ -166,9 +167,9 @@ const OutputFragment = $view(_ => {
   if (courses.length === 0) {
     _.$cls`ml-6`;
     _.div(_ => _.embed(ImportFromJw, true));
-    
+
     _.$cls`ml-7 mt-4 text-xl font-semibold`;
-    _.div("或在下方输入添加~")
+    _.div("或在下方输入添加~");
   }
 
   if (_.$updateContext) {

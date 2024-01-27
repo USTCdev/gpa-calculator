@@ -1,4 +1,5 @@
-import { Course, Level, Score, levelMap, failSym, passSym } from "./course";
+import { levelMap } from "./constants";
+import { Course, Level, Score, failSym, passSym } from "./course";
 
 export function loadFromJw(raw: string) {
   const lines = raw
