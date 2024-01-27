@@ -162,6 +162,15 @@ const OutputFragment = $view(_ => {
           }),
       ),
   );
+
+  if (courses.length === 0) {
+    _.$cls`ml-6`;
+    _.div(_ => _.embed(ImportFromJw, true));
+    
+    _.$cls`ml-7 mt-4 text-xl font-semibold`;
+    _.div("或在下方输入添加~")
+  }
+
   if (_.$updateContext) {
     sectionRef.current!.node.dataset["name"] = "2023-2024";
   }
@@ -305,81 +314,87 @@ const EditorFragment = $view(_ => {
 
 const jwRawInput = model("");
 
+const ImportFromJw = $view((primary: boolean) => {
+  _.fDialog(
+    open =>
+      _.$props({ appearance: primary ? "primary" : "secondary" }) &&
+      _.fButton(_ => {
+        _.$cls`mr-4`;
+        _(FiArrowImport20Filled)();
+        _.t`从教务系统导入`;
+      }) &&
+      open(),
+    _ => {
+      _.t`从教务系统导入`;
+      _.$cls`inline ml-4 mr-1`;
+      _(FiInfoRegular)();
+      _.$cls`text-2xl font-normal hover:text-blue-500 hover:underline`;
+      _.a(
+        "操作视频",
+        "https://xhfs4.ztytech.com/CA107011/b478b4b8c5874d568b8eb93644d7fc5b.gif",
+        "_blank",
+      );
+    },
+    _close => {
+      _.$cls`flex flex-col gap-4`;
+      _.div(_ => {
+        _.$cls`w-full h-[250px]`;
+        _.fTextarea(jwRawInput);
+
+        _.div(_ => {
+          _.$cls`ml-2 font-bold text-xl`;
+          _.div(_ => {
+            _.span("预览");
+            _.$cls`inline text-xl ml-6 mr-1`;
+            _(FiInfo12Regular)();
+            _.$cls`font-normal text-lg font-sans`;
+            _.span("如有错误，可以添加后再编辑哦");
+          });
+          _.$cls`table`;
+          _.table(
+            loadFromJw(jwRawInput.value),
+            ["名称", "编号", "学时", "学分", "绩点", "成绩"],
+            byIndex,
+            course => {
+              _.td(course.name);
+              _.td(course.id);
+              _.td(course.hour);
+              _.td(course.credits);
+              _.td(course.gpaStr);
+              _.td(course.scoreStr);
+            },
+          );
+        });
+      });
+    },
+    close => {
+      _.fButton("取消") && close();
+      _.fDialog(
+        open => _.fPrimaryButton("确定") && open(),
+        "确定？",
+        "导入后将会覆盖当前编辑器中的内容，确定要继续吗？",
+        closeInner => {
+          _.fButton("取消") && closeInner();
+          if (_.fPrimaryButton("确定")) {
+            courses = loadFromJw(jwRawInput.value);
+            selected = -1;
+            resetTempCourse();
+            close();
+            closeInner();
+          }
+        },
+      );
+    },
+    "end",
+    true,
+  );
+});
+
 const ImportExportFragment = $view(_ => {
   _.$cls`grid gap-4`;
   _.div(_ => {
     _.$css`max-width: 100vw-24px`;
-    _.fDialog(
-      open =>
-        _.fButton(_ => {
-          _.$cls`mr-4`;
-          _(FiArrowImport20Filled)();
-          _.t`从教务系统导入`;
-        }) && open(),
-      _ => {
-        _.t`从教务系统导入`;
-        _.$cls`inline ml-4 mr-1`;
-        _(FiInfoRegular)();
-        _.$cls`text-2xl font-normal hover:text-blue-500 hover:underline`;
-        _.a(
-          "操作视频",
-          "https://xhfs4.ztytech.com/CA107011/b478b4b8c5874d568b8eb93644d7fc5b.gif",
-          "_blank",
-        );
-      },
-      _close => {
-        _.$cls`flex flex-col gap-4`;
-        _.div(_ => {
-          _.$cls`w-full h-[250px]`;
-          _.fTextarea(jwRawInput);
-
-          _.div(_ => {
-            _.$cls`ml-2 font-bold text-xl`;
-            _.div(_ => {
-              _.span("预览");
-              _.$cls`inline text-xl ml-6 mr-1`;
-              _(FiInfo12Regular)();
-              _.$cls`font-normal text-lg font-sans`;
-              _.span("如有错误，可以添加后再编辑哦");
-            });
-            _.$cls`table`;
-            _.table(
-              loadFromJw(jwRawInput.value),
-              ["名称", "编号", "学时", "学分", "绩点", "成绩"],
-              byIndex,
-              course => {
-                _.td(course.name);
-                _.td(course.id);
-                _.td(course.hour);
-                _.td(course.credits);
-                _.td(course.gpaStr);
-                _.td(course.scoreStr);
-              },
-            );
-          });
-        });
-      },
-      close => {
-        _.fButton("取消") && close();
-        _.fDialog(
-          open => _.fPrimaryButton("确定") && open(),
-          "确定？",
-          "导入后将会覆盖当前编辑器中的内容，确定要继续吗？",
-          closeInner => {
-            _.fButton("取消") && closeInner();
-            if (_.fPrimaryButton("确定")) {
-              courses = loadFromJw(jwRawInput.value);
-              selected = -1;
-              resetTempCourse();
-              close();
-              closeInner();
-            }
-          },
-        );
-      },
-      "end",
-      true,
-    );
+    _.embed(ImportFromJw, false);
     if (
       _.fButton(_ => {
         _.$cls`mr-4`;
