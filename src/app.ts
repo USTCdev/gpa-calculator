@@ -14,7 +14,7 @@ import { FiSave20Regular } from "@refina/fluentui-icons/save";
 import "core-js/stable";
 import {
   $app,
-  $view,
+  Component,
   Context,
   Model,
   _,
@@ -22,7 +22,7 @@ import {
   componentRef,
   elementRef,
   model,
-  propModel,
+  propModel
 } from "refina";
 import "./styles.css";
 import { Course, Level, failSym, levelMap, passSym } from "./utils/course";
@@ -184,25 +184,27 @@ function resetTempCourse() {
   tempPass.value = true;
 }
 
-const TextInput = $view(
-  (name: string, key: keyof Course, placeholder: string) => {
+export class TextInput extends Component {
+  $main(name: string, key: keyof Course, placeholder: string) {
     _.$cls`my-4`;
     _.div(_ => {
       _.$cls`block mb-0 mr-2 font-semibold text-xl`;
       _.label(name);
       _.fInput(propModel(tempCourse, key) as Model<string>, false, placeholder);
     });
-  },
-);
+  }
+}
 
-const NumberInput = $view((name: string, key: keyof Course) => {
-  _.$cls`my-4`;
-  _.div(_ => {
-    _.$cls`block mb-0 mr-2 font-semibold text-xl`;
-    _.label(name);
-    _.fNumberInput(propModel(tempCourse, key) as Model<number>);
-  });
-});
+export class NumberInput extends Component {
+  $main(name: string, key: keyof Course) {
+    _.$cls`my-4`;
+    _.div(_ => {
+      _.$cls`block mb-0 mr-2 font-semibold text-xl`;
+      _.label(name);
+      _.fNumberInput(propModel(tempCourse, key) as Model<number>);
+    });
+  }
+}
 
 const EditorFragment = (_: Context) => {
   _.$cls`flex gap-x-6 flex-wrap`;
