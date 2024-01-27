@@ -11,7 +11,7 @@ export const levelMap = {
   "D+": [64, 65, 1.5],
   D: [61, 63, 1.3],
   "D-": [60, 61, 1],
-  F: [0, NaN, 0],
+  F: [0, 30, 0],
   P: [0, NaN, 0],
 } as const;
 export type Level = keyof typeof levelMap | "F";
