@@ -14,8 +14,8 @@ import { FiSave20Regular } from "@refina/fluentui-icons/save";
 import "core-js/stable";
 import {
   $app,
+  $view,
   Component,
-  Context,
   Model,
   _,
   byIndex,
@@ -65,7 +65,7 @@ function getOverview() {
 
 const sectionRef = elementRef<"section">();
 
-const OutputFragment = (_: Context) => {
+const OutputFragment = $view(_ => {
   _.$cls`overview`;
   _.div(_ =>
     _.ul(Object.entries(getOverview()), byIndex, ([k, v]) => {
@@ -165,7 +165,7 @@ const OutputFragment = (_: Context) => {
   if (_.$updateContext) {
     sectionRef.current!.node.dataset["name"] = "2023-2024";
   }
-};
+});
 
 const tabsRef = componentRef<"fTabs">();
 
@@ -206,7 +206,7 @@ export class NumberInput extends Component {
   }
 }
 
-const EditorFragment = (_: Context) => {
+const EditorFragment = $view(_ => {
   _.$cls`flex gap-x-6 flex-wrap`;
   _.div(_ => {
     _.div(_ => {
@@ -301,11 +301,11 @@ const EditorFragment = (_: Context) => {
       }
     }
   });
-};
+});
 
 const jwRawInput = model("");
 
-const ImportExportFragment = (_: Context) => {
+const ImportExportFragment = $view(_ => {
   _.$cls`grid gap-4`;
   _.div(_ => {
     _.$css`max-width: 100vw-24px`;
@@ -414,7 +414,7 @@ const ImportExportFragment = (_: Context) => {
       selected = -1;
     }
   });
-};
+});
 
 const app = $app([Basics, FluentUI(webDarkTheme, webLightTheme)], _ => {
   _.$cls`flex flex-col min-h-screen px-12 pb-12`;
