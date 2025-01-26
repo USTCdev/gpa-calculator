@@ -43,7 +43,19 @@ setInterval(() => {
 }, 500);
 
 function getOverview() {
-  const calculatedCourses = courses.filter(c => typeof c.score !== "symbol");
+  const map = new Map<string, Course>();
+  for (const course of courses) {
+    if (typeof course.score === "symbol") continue;
+    if (map.has(course.id)) {
+      const prev = map.get(course.id)!;
+      if (course.point > (prev.point as number)) {
+        map.set(course.id, course);
+      }
+    } else {   
+      map.set(course.id, course);
+    }
+  }
+  const calculatedCourses = Array.from(map.values());
   const calculatedCredits = calculatedCourses.reduce(
     (a, b) => a + b.credits,
     0,
